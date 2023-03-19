@@ -15,6 +15,9 @@ export default function Register() {
 
     const [avatar, setAvatar] = useState("");
     const [avatarPreview, setAvatarPreview] = useState("/images/default_avatar.png");
+    const [registerLocal, setRegisterLocal] = useState(false);
+    const [mobileOtp, setMobileOtp] = useState("");
+
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const { loading, error, isAuthenticated } = useSelector(state => state.authState);
@@ -30,6 +33,8 @@ export default function Register() {
             }
             reader.readAsDataURL(e.target.files[0])  // it will convert binary image data to url
             console.log(e.target.files[0])
+        } else if (e.target.name === 'mobileNo') {
+
         } else {
             setUserData({ ...userData, [e.target.name]: e.target.value })
         }
@@ -37,12 +42,24 @@ export default function Register() {
 
     const submitHandler = (e) => {
         e.preventDefault();
+        var expr = /^(0|91)?[6-9][0-9]{9}$/;
+        if (!expr.test(userData.mobile)) {
+            toast.error("Please enter valid India Number");
+            return;
+        }
+        // setRegisterLocal(true);
         const formData = new FormData()
         formData.append('name', userData.name)
         formData.append('email', userData.email)
         formData.append('password', userData.password)
+        formData.append('mobile', String(userData.mobile))
         formData.append('avatar', avatar)
         dispatch(register(formData))
+    }
+
+    const submitOtp = (e) => {
+        e.preventDefault();
+
     }
 
     useEffect(() => {
@@ -63,7 +80,7 @@ export default function Register() {
     return (
         <div className="row wrapper">
             <div className="col-10 col-lg-5">
-                <form onSubmit={submitHandler} className="shadow-lg" encType='multipart/form-data'>
+                {!registerLocal && <form onSubmit={submitHandler} className="shadow-lg" encType='multipart/form-data'>
                     <h1 className="mb-3">Register</h1>
 
                     <div className="form-group">
@@ -98,6 +115,18 @@ export default function Register() {
                             className="form-control"
                         />
                     </div>
+
+                    <div className="form-group">
+                        <label htmlFor="mobileNo_field">Mobile No</label>
+                        <input
+                            name="mobile"
+                            onChange={onChange}
+                            type="number"
+                            id="mobileNo_field"
+                            className="form-control"
+                        />
+                    </div>
+
 
                     <div className='form-group'>
                         <label htmlFor='avatar_upload'>Avatar</label>
@@ -134,7 +163,31 @@ export default function Register() {
                     >
                         REGISTER
                     </button>
+                </form>}
+
+                {registerLocal && <form onSubmit={submitOtp} className="shadow-lg">
+                    <h1 className="mb-3">OTP Verification</h1>
+                    <div className="form-group">
+                        <label htmlFor="otpMobile_field">Enter Mobile Number</label>
+                        <input
+                            type="number"
+                            id="otpMobile_field"
+                            className="form-control"
+                            value={mobileOtp}
+                            onChange={e => setMobileOtp(e.target.value)}
+                        />
+                    </div>
+
+                    <button
+                        id="forgot_password_button"
+                        type="submit"
+                        className="btn btn-block py-3">
+                        Send Email
+                    </button>
+
                 </form>
+
+                }
             </div>
         </div>
     )

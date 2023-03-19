@@ -155,6 +155,34 @@ const authSlice = createSlice({
                 error: action.payload
             }
         },
+        otpVerifyRequest(state, action) {
+            return {
+                ...state,
+                loading: true,
+                message: null
+            }
+        },
+        otpVerifySuccess(state, action) {
+            return {
+                ...state,
+                loading: false,
+                message: action.payload.message
+            }
+        },
+        otpVerifyFail(state, action) {
+            return {
+                ...state,
+                loading: false,
+                error: action.payload
+            }
+        },
+        clearForgotPassword(state, action) {
+            return {
+                ...state,
+                loading: false,
+                message: null
+            }
+        },
         resetPasswordRequest(state, action) {
             return {
                 ...state,
@@ -202,9 +230,13 @@ export const {
     updatePasswordRequest,
     updatePasswordSuccess,
     forgotPasswordFail,
+    clearForgotPassword,
     forgotPasswordRequest,
     forgotPasswordSuccess,
     resetPasswordFail,
+    otpVerifyRequest,
+    otpVerifyFail,
+    otpVerifySuccess,
     resetPasswordRequest,
     resetPasswordSuccess
 } = actions;

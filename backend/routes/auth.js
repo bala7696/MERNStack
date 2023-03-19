@@ -25,7 +25,8 @@ const {
     getAllUser,
     getUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    otpVerification
 } = require('../controllers/authController');
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/authenticate');
 const router = express.Router();
@@ -35,9 +36,10 @@ router.route('/login').post(loginuser);
 router.route('/logout').get(logoutUser);
 router.route('/password/forgot').post(forgotPassword);
 router.route('/password/reset/:token').post(resetPassword);
+router.route('/otpverify').post(otpVerification);
 router.route('/password/change').put(isAuthenticatedUser, changePassword);
 router.route('/myprofile').get(isAuthenticatedUser, getUserProfile);
-router.route('/update').put(isAuthenticatedUser,upload.single('avatar'), updateProfile);
+router.route('/update').put(isAuthenticatedUser, upload.single('avatar'), updateProfile);
 
 // Admin Routes
 

@@ -1,6 +1,7 @@
 import axios from "axios";
 import {
     clearError,
+    clearForgotPassword,
     forgotPasswordFail,
     forgotPasswordRequest,
     forgotPasswordSuccess,
@@ -12,6 +13,9 @@ import {
     loginSuccess,
     logoutFail,
     logoutSuccess,
+    otpVerifyFail,
+    otpVerifyRequest,
+    otpVerifySuccess,
     registerFail,
     registerRequest,
     registerSuccess,
@@ -53,6 +57,10 @@ export const login = (email, password) => async (dispatch) => {
 
 export const clearAuthError = dispatch => {
     dispatch(clearError());
+}
+
+export const clearForgotPasswordMsg = dispatch => {
+    dispatch(clearForgotPassword());
 }
 
 export const register = (userData) => async (dispatch) => {
@@ -131,6 +139,21 @@ export const forgotPassword = (formData) => async (dispatch) => {
         dispatch(forgotPasswordSuccess(data))
     } catch (error) {
         dispatch(forgotPasswordFail(error.response.data.message))
+    }
+}
+
+export const otpVerfify = (formData) => async (dispatch) => {
+    try {
+        dispatch(otpVerifyRequest());
+        const config = {
+            headers: {
+                'Content-type': 'application/json'
+            }
+        }
+        const { data } = await axios.post(`/api/v1/otpverify`, formData, config);
+        dispatch(otpVerifySuccess(data))
+    } catch (error) {
+        dispatch(otpVerifyFail(error.response.data.message))
     }
 }
 

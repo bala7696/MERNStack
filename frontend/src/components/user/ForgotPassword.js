@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { forgotPassword, clearAuthError } from '../../actions/userActions';
+import { forgotPassword, clearAuthError, clearForgotPasswordMsg } from '../../actions/userActions';
+import { clearForgotPassword } from '../../slices/authSlice'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -21,7 +22,8 @@ export default function ForgotPassword() {
         if (message) {
             toast(message, {
                 type: 'success',
-                position: toast.POSITION.BOTTOM_CENTER
+                position: toast.POSITION.BOTTOM_CENTER,
+                onOpen: () => { dispatch(clearForgotPasswordMsg) }
             });
             setEmail("");
             return
@@ -35,7 +37,7 @@ export default function ForgotPassword() {
             });
             return
         }
-    }, [message, error,dispatch])
+    }, [message, error, dispatch])
 
     return (
         <div className="row wrapper">

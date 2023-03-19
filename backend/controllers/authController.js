@@ -1,6 +1,7 @@
 const catchAsyncError = require('../middlewares/catchAsyncError');
 const User = require('../models/userModel');
-const sendEmail = require('../utils/email');
+const OTP = require('../models/otpModel');
+const { sendEmail, sendEmailRegistration } = require('../utils/email');
 const ErrorHandler = require('../utils/errorHandler');
 const sendToken = require('../utils/jwt');
 const crypto = require('crypto');
@@ -8,7 +9,7 @@ const crypto = require('crypto');
 
 // Register User - /api/v1/register
 exports.registerUser = catchAsyncError(async (req, res, next) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, mobile } = req.body;
 
     let BASE_URL = process.env.BACKEND_URL
     if (process.env.NODE_ENV === "production") {
@@ -23,8 +24,15 @@ exports.registerUser = catchAsyncError(async (req, res, next) => {
         name,
         email,
         password,
+        mobile,
         avatar
     });
+    const message = `Hello ${user.name}`
+    sendEmailRegistration({
+        email: user.email,
+        subject: "Bala Ekart Ecommerce",
+        message
+    })
 
     sendToken(user, 201, res);
 
@@ -144,6 +152,45 @@ exports.resetPassword = catchAsyncError(async (req, res, next) => {
     user.resetPasswordTokenExpire = undefined;
     await user.save({ validateBeforeSave: false });
     sendToken(user, 201, res);
+
+});
+
+// Otp Verification -- /api/v1/otpverify
+
+exports.otpVerification = catchAsyncError(async (req, res, next) => {
+
+
+    const mobileNo = req.body.mobile;
+
+
+    const mobile = await OTP.findOne({ mobile: req.body.mobile });
+    const user = await OTP.create({
+        mobile,
+        code
+    })
+
+    const resetUrl = `${BASE_URL}/password/reset/${resetToken}`
+    const message = `Your password reset url is as follow \n\n 
+    ${resetUrl}\n\n if you have not requested this email, then ignore it.`
+
+    try {
+        sendEmail({
+            email: user.email,
+            subject: "Bala Ekart Password Recovery",
+            message
+        })
+
+        res.status(200).json({
+            success: true,
+            message: `Email sent to ${user.email}`
+        })
+
+    } catch (err) {
+        user.resetPasswordToken = undefined; // we are just setting the value as undefined in database if email is not sent
+        user.resetPasswordTokenExpire = undefined;
+        await user.save({ validateBeforeSave: flase });
+        return next(new ErrorHandler(err.message, 500));
+    }
 
 })
 

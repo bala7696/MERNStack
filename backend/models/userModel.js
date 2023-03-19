@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'user'
     },
+    mobile: {
+        type: String,
+        required: [true, 'Please enter Mobile Number'],
+    },
     resetPasswordToken: String,
     resetPasswordTokenExpire: Date,
     createdAt: {
